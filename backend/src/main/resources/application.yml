@@ -1,0 +1,39 @@
+spring:
+  config:
+    import: "optional:file:.env[.properties]"
+  devtools:
+    restart:
+      exclude: "static/**,public/**,assets/**"
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    show-sql: true
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+  mail:
+    host: ${MAIL_HOST}
+    port: ${MAIL_PORT}
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+server:
+  port: 8080
+
+jwt:
+  secret: ${JWT_SECRET}
+  expiration-minutes: ${JWT_EXPIRATION_MINUTES}
+  refresh-expiration-days: ${JWT_REFRESH_EXPIRATION_DAYS}
+  confirmation-expiration-hours: ${JWT_CONFIRMATION_EXPIRATION_HOURS}
+
+app:
+  url: ${APP_URL:http://localhost:5173}
