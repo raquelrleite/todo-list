@@ -7,7 +7,6 @@ import br.com.todolist.dto.request.UserRequest;
 import br.com.todolist.dto.response.LoginResponse;
 import br.com.todolist.dto.response.MessageResponse;
 import br.com.todolist.dto.response.UserResponse;
-import br.com.todolist.enums.EmailType;
 import br.com.todolist.enums.UserRole;
 import br.com.todolist.exception.BusinessException;
 import br.com.todolist.infra.email.EmailService;
@@ -27,6 +26,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.Map;
 
+import static br.com.todolist.enums.AuthProvider.LOCAL;
+import static br.com.todolist.enums.EmailType.*;
 import static br.com.todolist.enums.ErrorCode.*;
 
 @Slf4j
@@ -56,12 +57,13 @@ public class UserService {
 
         var user = mapper.toEntity(request);
         user.setRole(UserRole.USER);
+        user.setProvider(LOCAL);
         user.setPassword(passwordEncoder.encode(request.password()));
         repository.save(user);
 
         String token = tokenService.generateAccountConfirmationToken(user);
 
-        emailService.sendEmail(user.getEmail(), EmailType.ACCOUNT_CONFIRMATION, Map.of(
+        emailService.sendEmail(user.getEmail(), ACCOUNT_CONFIRMATION, Map.of(
                 "name", user.getName(),
                 "confirmUrl", appUrl + "/account-confirmation?token=" + token,
                 EXPIRATION_HOURS, confirmationExpirationHours
@@ -83,21 +85,21 @@ public class UserService {
         user.setVerified(true);
         repository.save(user);
 
-        return new MessageResponse(EmailType.ACCOUNT_CONFIRMATION.getMessage());
+        return new MessageResponse(ACCOUNT_CONFIRMATION.getMessage());
     }
 
     public MessageResponse resendConfirmation(EmailRequest request) {
         repository.findByEmail(request.email()).ifPresent(user -> {
             if (!user.isVerified()) {
                 String token = tokenService.generateAccountConfirmationToken(user);
-                emailService.sendEmail(user.getEmail(), EmailType.ACCOUNT_CONFIRMATION, Map.of(
+                emailService.sendEmail(user.getEmail(), ACCOUNT_CONFIRMATION, Map.of(
                         "name", user.getName(),
                         "confirmUrl", appUrl + "/account-confirmation?token=" + token,
                         EXPIRATION_HOURS, confirmationExpirationHours
                 ));
             }
         });
-        return new MessageResponse(EmailType.ACCOUNT_CONFIRMATION.getMessage());
+        return new MessageResponse(ACCOUNT_CONFIRMATION.getMessage());
     }
 
     public LoginResponse login(LoginRequest request) {
@@ -109,7 +111,6 @@ public class UserService {
             if (!(authentication.getPrincipal() instanceof UserDetailsImpl(User user))) {
                 throw new BusinessException(INVALID_CREDENTIALS);
             }
-
 
             if (!user.isVerified()) {
                 throw new BusinessException(ACCOUNT_NOT_VERIFIED);
@@ -153,14 +154,14 @@ public class UserService {
         repository.findByEmail(request.email()).ifPresent(user -> {
             String token = tokenService.generatePasswordResetToken(user);
 
-            emailService.sendEmail(user.getEmail(), EmailType.PASSWORD_RESET, Map.of(
+            emailService.sendEmail(user.getEmail(), PASSWORD_RESET, Map.of(
                     "name", user.getName(),
                     "appUrl", appUrl + "/reset-password?token=" + token,
                     EXPIRATION_HOURS, 1
             ));
         });
 
-        return new MessageResponse(EmailType.PASSWORD_RESET.getMessage());
+        return new MessageResponse(PASSWORD_RESET.getMessage());
     }
 
     public MessageResponse resetPassword(ResetPasswordRequest request) {
@@ -176,10 +177,10 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(request.password()));
         repository.save(user);
 
-        emailService.sendEmail(user.getEmail(), EmailType.PASSWORD_CHANGED, Map.of(
+        emailService.sendEmail(user.getEmail(), PASSWORD_CHANGED, Map.of(
                 "name", user.getName()
         ));
 
-        return new MessageResponse(EmailType.PASSWORD_CHANGED.getMessage());
+        return new MessageResponse(PASSWORD_CHANGED.getMessage());
     }
 }

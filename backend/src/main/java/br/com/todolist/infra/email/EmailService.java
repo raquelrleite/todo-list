@@ -22,7 +22,7 @@ public class EmailService {
     private final JavaMailSender mailSender;
     private final ITemplateEngine templateEngine;
 
-    @Value("${MAIL_FROM}")
+    @Value("${MAIL_USERNAME}")
     private String from;
 
     @Async

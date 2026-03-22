@@ -1,12 +1,13 @@
 package br.com.todolist.infra.security;
 
+import br.com.todolist.infra.oauth2.AuthenticatedUser;
 import br.com.todolist.model.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 
-public record UserDetailsImpl(User user) implements UserDetails {
+public record UserDetailsImpl(User user) implements UserDetails, AuthenticatedUser {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

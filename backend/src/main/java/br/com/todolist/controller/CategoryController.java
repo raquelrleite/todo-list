@@ -2,7 +2,7 @@ package br.com.todolist.controller;
 
 import br.com.todolist.dto.request.CategoryRequest;
 import br.com.todolist.dto.response.CategoryResponse;
-import br.com.todolist.infra.security.UserDetailsImpl;
+import br.com.todolist.infra.oauth2.AuthenticatedUser;
 import br.com.todolist.service.CategoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -21,28 +21,28 @@ public class CategoryController {
     private final CategoryService service;
 
     @PostMapping
-    public CategoryResponse create(@RequestBody @Valid CategoryRequest request, @AuthenticationPrincipal UserDetailsImpl userDetails){
-        return service.create(request, userDetails.user());
+    public CategoryResponse create(@RequestBody @Valid CategoryRequest request, @AuthenticationPrincipal AuthenticatedUser authenticated){
+        return service.create(request, authenticated.user());
     }
 
     @GetMapping("/{title}")
-    public List<CategoryResponse> findByTitle(@PathVariable String title, @AuthenticationPrincipal UserDetailsImpl userDetails){
-        return service.findByTitle(title, userDetails.user());
+    public List<CategoryResponse> findByTitle(@PathVariable String title, @AuthenticationPrincipal AuthenticatedUser authenticated){
+        return service.findByTitle(title, authenticated.user());
     }
 
     @GetMapping
-    public List<CategoryResponse> findAll(@AuthenticationPrincipal UserDetailsImpl userDetails){
-        return service.findAll(userDetails.user());
+    public List<CategoryResponse> findAll(@AuthenticationPrincipal AuthenticatedUser authenticated){
+        return service.findAll(authenticated.user());
     }
 
     @PatchMapping("/{id}")
-    public CategoryResponse update(@PathVariable Long id, @RequestBody @Valid CategoryRequest request, @AuthenticationPrincipal UserDetailsImpl userDetails){
-        return service.update(id, request, userDetails.user());
+    public CategoryResponse update(@PathVariable Long id, @RequestBody @Valid CategoryRequest request, @AuthenticationPrincipal AuthenticatedUser authenticated){
+        return service.update(id, request, authenticated.user());
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id, @AuthenticationPrincipal UserDetailsImpl userDetails){
-        service.delete(id, userDetails.user());
+    public void delete(@PathVariable Long id, @AuthenticationPrincipal AuthenticatedUser authenticated){
+        service.delete(id, authenticated.user());
     }
 
 }

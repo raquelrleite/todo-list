@@ -2,11 +2,13 @@ CREATE TABLE users
 (
     id       bigint PRIMARY KEY AUTO_INCREMENT,
     name     varchar(50)  NOT NULL,
-    email    varchar(50)  NOT NULL UNIQUE,
-    password varchar(255) NOT NULL,
-    role     varchar(50)  NOT NULL,
-    verified boolean      NOT NULL DEFAULT FALSE
-);
+    email    varchar(70)  NOT NULL UNIQUE,
+    password varchar(255) NULL,
+    role     varchar(50)  NOT NULL DEFAULT 'USER',
+    verified boolean      NOT NULL DEFAULT FALSE,
+    provider VARCHAR(20) NOT NULL DEFAULT 'LOCAL',
+    provider_id VARCHAR(255) NULL
+    );
 
 
 CREATE TABLE categories
