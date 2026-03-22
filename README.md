@@ -2,14 +2,14 @@
 
 <h1>✅ Todo List</h1>
 
-<p>Aplicação full stack de gerenciamento de tarefas com autenticação JWT, confirmação de conta por e-mail, recuperação de senha e editor rich text.</p>
+<p>Aplicação full stack de gerenciamento de tarefas com autenticação híbrida (JWT + OAuth2), login social via Google e GitHub, confirmação de conta por e-mail e editor rich text.</p>
 
 <br/>
 
-<!-- Linguagens -->
 ![Java](https://img.shields.io/badge/Java_21-007396?style=for-the-badge&logo=openjdk&logoColor=white)
 ![Spring Boot](https://img.shields.io/badge/Spring_Boot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)
 ![Spring Security](https://img.shields.io/badge/Spring_Security-6DB33F?style=for-the-badge&logo=springsecurity&logoColor=white)
+![OAuth2](https://img.shields.io/badge/OAuth2-000000?style=for-the-badge&logo=auth0&logoColor=white)
 ![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white)
 ![JWT](https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=jsonwebtokens&logoColor=white)
 ![Flyway](https://img.shields.io/badge/Flyway-CC0200?style=for-the-badge&logo=flyway&logoColor=white)
@@ -26,6 +26,7 @@
 
 - [Sobre o Projeto](#-sobre-o-projeto)
 - [Funcionalidades](#-funcionalidades)
+- [Autenticação e Segurança](#-autenticação-e-segurança)
 - [Arquitetura](#-arquitetura)
 - [Tecnologias](#-tecnologias)
 - [Pré-requisitos](#-pré-requisitos)
@@ -38,40 +39,75 @@
 
 ## 💡 Sobre o Projeto
 
-O **Todo List** é uma aplicação full stack construída com **Spring Boot** no backend e **React + Vite** no frontend. O projeto foi desenvolvido com foco em boas práticas de arquitetura, autenticação segura e uma interface web moderna e responsiva.
+O **Todo List** é uma aplicação full stack construída com **Spring Boot** no backend e **React + Vite** no frontend.
 
-A solução é dividida em duas camadas independentes — backend e frontend — o que facilita manutenção, escalabilidade e evolução do sistema.
+O projeto suporta três formas de autenticação — e-mail/senha, Google e GitHub — com uma arquitetura de segurança híbrida: tokens JWT transportados via header `Authorization` no login local, e via **Cookies HttpOnly** no login social, protegendo contra XSS.
 
 ---
 
 ## ✨ Funcionalidades
 
-- 📝 Cadastro e login de usuários
+- 📝 Cadastro e login com e-mail e senha
+- 🌐 Login social com **Google** e **GitHub** via OAuth2
 - 🔐 Autenticação com JWT (access token + refresh token)
-- ✉️ Confirmação de conta por e-mail
-- 🔁 Reenvio de e-mail de confirmação
+- 🍪 Sessão OAuth2 protegida via **Cookies HttpOnly**
+- ✉️ Confirmação de conta por e-mail e reenvio de token
 - 🔑 Recuperação e redefinição de senha
 - 📂 CRUD completo de categorias
 - ✅ CRUD completo de tarefas
 - 🟢 Marcação de tarefas como concluídas
 - 🔍 Busca e filtro de tarefas (pendentes / concluídas)
-- ✍️ Editor rich text na descrição das tarefas (Tiptap)
-- 🛡️ Sanitização de HTML com DOMPurify
+- ✍️ Editor **rich text** na descrição das tarefas (Tiptap)
+- 🛡️ Sanitização de HTML com **DOMPurify**
+- 📱 Interface responsiva
+
+---
+
+## 🔐 Autenticação e Segurança
+
+A aplicação suporta dois fluxos que coexistem sem conflito, validados pelo mesmo filtro JWT:
+
+### Fluxo Local — E-mail + Senha
+
+1. Usuário se cadastra com nome, e-mail e senha
+2. Recebe link de confirmação por e-mail (`?token=...`)
+3. Após confirmar, faz login e recebe `accessToken` + `refreshToken` no corpo da resposta
+4. Frontend armazena no `localStorage` e envia via header `Authorization: Bearer`
+
+### Fluxo Social — Google / GitHub
+
+1. Usuário clica em "Continue with Google" ou "Continue with GitHub"
+2. É redirecionado ao provedor, que autentica e retorna ao backend
+3. O backend busca ou cria o usuário no banco — sem senha, campo `nullable`
+4. Gera o JWT e o envia como **Cookie HttpOnly**, invisível para JavaScript
+5. Todas as requisições seguintes enviam o cookie automaticamente
+
+> **Detalhe GitHub:** quando o e-mail do perfil é privado, o backend faz uma chamada adicional para `https://api.github.com/user/emails` para buscar o e-mail primário verificado.
+
+### SecurityFilter — leitura dupla de token
+
+O filtro JWT tenta recuperar o token em dois lugares, nessa ordem:
+1. Header `Authorization: Bearer` — login local
+2. Cookie `accessToken` — login social
 
 ---
 
 ## 🏗️ Arquitetura
 
-A aplicação segue o padrão **cliente-servidor**:
-
-- **Backend (`/backend`)** — API REST com Spring Boot: autenticação, gestão de usuários, categorias, tarefas e envio de e-mails.
-- **Frontend (`/frontend`)** — SPA em React que consome a API via HTTP com autenticação JWT no header `Authorization`.
-
 ```
-Frontend (React)  ──→  http://localhost:8080  ──→  Backend (Spring Boot)  ──→  MySQL
+Frontend (React SPA)
+    │
+    ├── Authorization: Bearer xxx  ──→  Login local
+    └── Cookie: accessToken=xxx    ──→  Login social
+                    │
+                    ▼
+        Backend (Spring Boot REST)
+                    │
+          ┌─────────┴──────────┐
+          ▼                    ▼
+        MySQL           Google / GitHub
+                         (OAuth2)
 ```
-
-> Por padrão, o frontend aponta para `http://localhost:8080` (configurado em `frontend/src/App.jsx`).
 
 ---
 
@@ -82,37 +118,35 @@ Frontend (React)  ──→  http://localhost:8080  ──→  Backend (Spring B
 |---|---|
 | Java 21 | Linguagem principal |
 | Spring Boot | Framework base |
-| Spring Security | Controle de autenticação e autorização |
-| Spring Data JPA / Hibernate | Persistência e ORM |
-| MySQL | Banco de dados relacional |
-| Flyway | Migrations do banco de dados |
+| Spring Security | Autenticação, autorização e filtros |
+| Spring OAuth2 Client | Integração com Google e GitHub |
+| Spring Data JPA | Persistência e ORM |
+| MySQL + Flyway | Banco de dados e migrations |
 | JWT (`java-jwt`) | Geração e validação de tokens |
-| Spring Mail + Thymeleaf | Envio e templates de e-mail |
+| Spring Mail + Thymeleaf | E-mails transacionais com templates HTML |
 | Lombok + MapStruct | Redução de boilerplate |
-| Maven | Gerenciamento de build e dependências |
+| Maven | Build e dependências |
 
 ### Frontend
 | Tecnologia | Descrição |
 |---|---|
 | React 19 | Biblioteca de UI |
 | Vite | Bundler e servidor de desenvolvimento |
+| Fetch API | Requisições HTTP com `credentials: "include"` |
 | Tiptap | Editor rich text |
 | DOMPurify | Sanitização de HTML |
-| ESLint | Linting de código |
 | npm | Gerenciador de pacotes |
 
 ---
 
 ## 📋 Pré-requisitos
 
-Antes de executar o projeto, certifique-se de ter instalado:
-
 - **Java 21**
 - **Maven 3.9+**
 - **MySQL 8+**
-- **Node.js 18+ (LTS recomendado)**
-- **npm**
-- Uma conta **SMTP** válida (necessária para confirmação de conta e recuperação de senha)
+- **Node.js 18+ (LTS)**
+- Conta **SMTP** para envio de e-mails (Gmail recomendado com App Password)
+- Credenciais OAuth2 do **Google** e/ou **GitHub** (opcional)
 
 ---
 
@@ -120,64 +154,53 @@ Antes de executar o projeto, certifique-se de ter instalado:
 
 ### 1. Crie o arquivo `.env` na pasta `backend/`
 
-Copie o exemplo abaixo e preencha com os seus dados:
-
 ```env
 # Banco de Dados
 DB_URL=jdbc:mysql://localhost:3306/todolist
-DB_USERNAME=seu_usuario_mysql
-DB_PASSWORD=sua_senha_mysql
+DB_USERNAME=seu_usuario
+DB_PASSWORD=sua_senha
 
-# Servidor de E-mail (SMTP)
-MAIL_HOST=seu_host_smtp
-MAIL_PORT=sua_porta_smtp
-MAIL_USERNAME=seu_email_ou_usuario_smtp
-MAIL_PASSWORD=sua_senha_smtp
+# E-mail (Gmail)
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USERNAME=seu_email@gmail.com
+MAIL_PASSWORD=sua_app_password   # App Password, não a senha normal
+MAIL_FROM=seu_email@gmail.com
 
 # JWT
-JWT_SECRET=uma_chave_jwt_forte_e_segura
+JWT_SECRET=chave_longa_e_segura
 JWT_EXPIRATION_MINUTES=15
 JWT_REFRESH_EXPIRATION_DAYS=7
 JWT_CONFIRMATION_EXPIRATION_HOURS=24
 
 # URL do Frontend
 APP_URL=http://localhost:5173
+
+# OAuth2 — Google
+GOOGLE_CLIENT_ID=seu_google_client_id
+GOOGLE_CLIENT_SECRET=seu_google_client_secret
+
+# OAuth2 — GitHub
+GITHUB_CLIENT_ID=seu_github_client_id
+GITHUB_CLIENT_SECRET=seu_github_client_secret
 ```
 
-> Um arquivo `.env.example` com o modelo acima está disponível na raiz do projeto para referência.
+### 2. Configurar OAuth2 no Google
 
-<details>
-<summary>📖 Descrição das variáveis</summary>
+1. Acesse o [Google Cloud Console](https://console.cloud.google.com/)
+2. Crie um projeto → **Credenciais → ID do cliente OAuth → Aplicativo da Web**
+3. URI de redirecionamento autorizado: `http://localhost:8080/login/oauth2/code/google`
+4. Copie o Client ID e Client Secret para o `.env`
 
-| Variável | Descrição |
-|---|---|
-| `DB_URL` | URL de conexão com o banco MySQL |
-| `DB_USERNAME` | Usuário do banco de dados |
-| `DB_PASSWORD` | Senha do banco de dados |
-| `MAIL_HOST` | Host do servidor SMTP |
-| `MAIL_PORT` | Porta do servidor SMTP |
-| `MAIL_USERNAME` | Usuário/e-mail da conta SMTP |
-| `MAIL_PASSWORD` | Senha da conta SMTP |
-| `JWT_SECRET` | Segredo para assinar os tokens JWT |
-| `JWT_EXPIRATION_MINUTES` | Expiração do access token (em minutos) |
-| `JWT_REFRESH_EXPIRATION_DAYS` | Expiração do refresh token (em dias) |
-| `JWT_CONFIRMATION_EXPIRATION_HOURS` | Validade do token de confirmação de conta |
-| `APP_URL` | URL base do frontend, usada nos e-mails gerados |
+### 3. Configurar OAuth2 no GitHub
 
-</details>
+1. **GitHub → Settings → Developer settings → OAuth Apps → New OAuth App**
+2. Authorization callback URL: `http://localhost:8080/login/oauth2/code/github`
+3. Copie o Client ID e Client Secret para o `.env`
 
 ---
 
 ## 🚀 Como Executar
-
-### Ordem recomendada
-
-1. Inicie o **MySQL**
-2. Suba o **backend**
-3. Suba o **frontend**
-4. Acesse a aplicação no navegador
-
----
 
 ### Backend
 
@@ -186,9 +209,7 @@ cd backend
 mvn spring-boot:run
 ```
 
-A API estará disponível em: `http://localhost:8080`
-
----
+API disponível em `http://localhost:8080`
 
 ### Frontend
 
@@ -198,7 +219,7 @@ npm install
 npm run dev
 ```
 
-O frontend estará disponível em: `http://localhost:5173`
+Frontend disponível em `http://localhost:5173`
 
 ---
 
@@ -206,39 +227,48 @@ O frontend estará disponível em: `http://localhost:5173`
 
 ### Usuários — `/v1/users`
 
-| Método | Rota | Descrição | Autenticação |
+| Método | Rota | Descrição | Auth |
 |---|---|---|---|
-| `POST` | `/register` | Cadastra um novo usuário | ❌ |
-| `GET` | `/account-confirmation?token=...` | Confirma a conta via token | ❌ |
-| `POST` | `/resend-confirmation` | Reenvia o e-mail de confirmação | ❌ |
-| `POST` | `/login` | Autentica e retorna access + refresh token | ❌ |
-| `POST` | `/refresh` | Gera novos tokens a partir do refresh token | ❌ |
-| `POST` | `/forgot-password` | Envia e-mail de recuperação de senha | ❌ |
-| `POST` | `/reset-password` | Redefine a senha com token de recuperação | ❌ |
+| `POST` | `/register` | Cadastra novo usuário | ❌ |
+| `GET` | `/account-confirmation?token=` | Confirma conta via e-mail | ❌ |
+| `POST` | `/resend-confirmation` | Reenvia e-mail de confirmação | ❌ |
+| `POST` | `/login` | Login e retorna access + refresh token | ❌ |
+| `POST` | `/refresh` | Renova tokens via refresh token | ❌ |
+| `POST` | `/forgot-password` | Envia link de recuperação de senha | ❌ |
+| `POST` | `/reset-password` | Redefine a senha com token | ❌ |
+
+### Login Social — OAuth2
+
+| Rota | Descrição |
+|---|---|
+| `/oauth2/authorization/google` | Inicia fluxo OAuth2 com Google |
+| `/oauth2/authorization/github` | Inicia fluxo OAuth2 com GitHub |
+
+> Após autenticação, redireciona para `{APP_URL}/oauth2/callback` com tokens em Cookies HttpOnly.
 
 ### Categorias — `/v1/categories` 🔒
 
 | Método | Rota | Descrição |
 |---|---|---|
-| `POST` | `/` | Cria uma nova categoria |
-| `GET` | `/{title}` | Busca categorias pelo título |
-| `GET` | `/` | Lista todas as categorias do usuário |
-| `PATCH` | `/{id}` | Atualiza uma categoria |
-| `DELETE` | `/{id}` | Remove uma categoria |
+| `POST` | `/` | Cria categoria |
+| `GET` | `/` | Lista categorias do usuário |
+| `GET` | `/{title}` | Busca por título |
+| `PATCH` | `/{id}` | Atualiza categoria |
+| `DELETE` | `/{id}` | Remove categoria |
 
 ### Tarefas — `/v1/tasks` 🔒
 
 | Método | Rota | Descrição |
 |---|---|---|
-| `POST` | `/` | Cria uma nova tarefa |
-| `GET` | `/?done={true\|false}` | Lista tarefas por status de conclusão |
-| `GET` | `/title/{title}` | Busca tarefas pelo título |
-| `GET` | `/category/{id}` | Lista tarefas de uma categoria |
-| `PATCH` | `/{id}` | Atualiza os dados de uma tarefa |
-| `PATCH` | `/complete/{id}` | Marca uma tarefa como concluída |
-| `DELETE` | `/{id}` | Remove uma tarefa |
+| `POST` | `/` | Cria tarefa |
+| `GET` | `/?done={true\|false}` | Lista por status |
+| `GET` | `/title/{title}` | Busca por título |
+| `GET` | `/category/{id}` | Lista por categoria |
+| `PATCH` | `/{id}` | Atualiza tarefa |
+| `PATCH` | `/complete/{id}` | Marca como concluída |
+| `DELETE` | `/{id}` | Remove tarefa |
 
-> 🔒 Todos os endpoints de categorias e tarefas exigem autenticação via **Bearer Token** no header `Authorization`.
+> 🔒 Requer `Authorization: Bearer` (login local) ou Cookie `accessToken` (login social).
 
 ---
 
@@ -247,17 +277,29 @@ O frontend estará disponível em: `http://localhost:5173`
 ```
 todo-list/
 ├── backend/
-│   ├── src/
-│   │   └── main/
-│   │       ├── java/          # Código-fonte Java
-│   │       └── resources/
-│   │           └── application.yml
+│   ├── src/main/java/br/com/todolist/
+│   │   ├── controller/        # Endpoints REST
+│   │   ├── service/           # Lógica de negócio
+│   │   ├── repository/        # Acesso ao banco
+│   │   ├── model/             # Entidades JPA
+│   │   ├── dto/               # Requests e Responses
+│   │   ├── mapper/            # MapStruct
+│   │   ├── enums/             # UserRole, AuthProvider, EmailType, ErrorCode
+│   │   ├── exception/         # GlobalExceptionHandler, BusinessException
+│   │   └── infra/
+│   │       ├── security/      # JWT, SecurityConfig, SecurityFilter, UserDetailsImpl
+│   │       ├── oauth2/        # CustomOAuth2UserService, OAuth2SuccessHandler, OAuth2UserPrincipal
+│   │       └── email/         # EmailService + templates Thymeleaf
+│   ├── src/main/resources/
+│   │   ├── application.yml
+│   │   ├── db/migration/      # V1__initial_schema.sql
+│   │   └── templates/email/   # account-confirmation, password-reset, password-changed
 │   └── pom.xml
 ├── frontend/
-│   ├── src/
-│   │   └── App.jsx            # API_URL configurada aqui
+│   ├── src/App.jsx
+│   ├── vite.config.js
 │   └── package.json
-├── requisicoes-postman/       # Coleção de requisições para testes
+├── requisicoes-postman/
 ├── .env.example
 └── .gitignore
 ```
