@@ -34,7 +34,10 @@ public class SecurityFilter extends OncePerRequestFilter {
             token = recoverTokenFromCookie(request);
         }
 
-        if (token != null) {
+        if (token == null) {
+            log.debug("No JWT token found in request to {}", request.getRequestURI());
+        } else {
+            log.debug("JWT token found in request to {}", request.getRequestURI());
             String subject = tokenService.validateAccessToken(token);
 
             if (subject != null && SecurityContextHolder.getContext().getAuthentication() == null) {

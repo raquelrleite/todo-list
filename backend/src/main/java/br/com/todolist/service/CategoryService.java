@@ -8,6 +8,7 @@ import br.com.todolist.model.Category;
 import br.com.todolist.model.User;
 import br.com.todolist.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ import java.util.List;
 import static br.com.todolist.enums.ErrorCode.CATEGORY_ALREADY_EXISTS;
 import static br.com.todolist.enums.ErrorCode.CATEGORY_NOT_FOUND;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -28,7 +30,9 @@ public class CategoryService {
     private final TaskService taskService;
 
     public CategoryResponse create(CategoryRequest request, User user) {
+        log.info("Creating category with title: {} for user: {}", request.title(), user.getEmail());
         if (repository.existsByTitleAndUser(request.title(), user)) {
+            log.warn("Category with title {} already exists for user: {}", request.title(), user.getEmail());
             throw new BusinessException(CATEGORY_ALREADY_EXISTS);
         }
 
@@ -39,6 +43,7 @@ public class CategoryService {
     }
 
     public List<CategoryResponse> findByTitle(String title, User user) {
+        log.info("Finding categories by title: {} for user: {}", title, user.getEmail());
         return repository.findByTitleAndUser(title, user)
                 .stream()
                 .map(mapper::toResponse)
@@ -46,11 +51,13 @@ public class CategoryService {
     }
 
     public Page<CategoryResponse> findAll(User user, Pageable pageable) {
+        log.info("Finding all categories for user: {}", user.getEmail());
         return repository.findAllByUser(user, pageable)
                 .map(mapper::toResponse);
     }
 
     public CategoryResponse update(Long id, CategoryRequest request, User user) {
+        log.info("Updating category ID: {} for user: {}", id, user.getEmail());
         Category category = repository.findByIdAndUser(id, user)
                 .orElseThrow(() -> new BusinessException(CATEGORY_NOT_FOUND));
 
@@ -60,6 +67,7 @@ public class CategoryService {
     }
 
     public void delete(Long id, User user) {
+        log.info("Deleting category ID: {} for user: {}", id, user.getEmail());
         var category = repository.findByIdAndUser(id, user)
                 .orElseThrow(() -> new BusinessException(CATEGORY_NOT_FOUND));
         repository.delete(category);

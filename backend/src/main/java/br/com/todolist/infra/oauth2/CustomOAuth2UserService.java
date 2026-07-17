@@ -32,6 +32,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         OAuth2User oAuth2User = super.loadUser(userRequest);
 
         String registrationId = userRequest.getClientRegistration().getRegistrationId();
+        log.info("OAuth2 login attempt for registrationId: {}", registrationId);
         AuthProvider provider = AuthProvider.valueOf(registrationId.toUpperCase());
 
         String providerId = extractProviderId(oAuth2User, provider);

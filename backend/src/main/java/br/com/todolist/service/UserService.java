@@ -55,7 +55,9 @@ public class UserService {
     private final LoginAttemptService loginAttemptService;
 
     public UserResponse register(UserRequest request) {
+        log.info("Registering user with email: {}", request.email());
         if (repository.existsByEmail(request.email())) {
+            log.warn("Registration failed: Email {} already exists", request.email());
             throw new BusinessException(EMAIL_ALREADY_EXISTS);
         }
 
@@ -77,9 +79,11 @@ public class UserService {
     }
 
     public MessageResponse confirmAccount(String token) {
+        log.info("Confirming account with token");
         String email = tokenService.validateAccountConfirmationToken(token);
 
         if (email == null) {
+            log.warn("Account confirmation failed: invalid or expired token");
             throw new BusinessException(TOKEN_INVALID_OR_EXPIRED);
         }
 
@@ -93,6 +97,7 @@ public class UserService {
     }
 
     public MessageResponse resendConfirmation(EmailRequest request) {
+        log.info("Resending confirmation for email: {}", request.email());
         repository.findByEmail(request.email()).ifPresent(user -> {
             if (!user.isVerified()) {
                 String token = tokenService.generateAccountConfirmationToken(user);
@@ -121,10 +126,12 @@ public class UserService {
             }
 
             if (!user.isVerified()) {
+                log.warn("Login failed: account not verified for email: {}", request.email());
                 throw new BusinessException(ACCOUNT_NOT_VERIFIED);
             }
 
             loginAttemptService.loginSucceeded(request.email());
+            log.info("User {} successfully logged in", request.email());
 
             return new LoginResponse(
                     tokenService.generateAccessToken(user),
@@ -152,6 +159,7 @@ public class UserService {
             var user = repository.findById(userId)
                     .orElseThrow(() -> new BusinessException(USER_NOT_FOUND));
 
+            log.info("Token refreshed for user ID: {}", userId);
             return new LoginResponse(
                     tokenService.generateAccessToken(user),
                     tokenService.generateRefreshToken(user), user.getName()
@@ -162,7 +170,9 @@ public class UserService {
     }
 
     public MessageResponse forgotPassword(EmailRequest request) {
+        log.info("Forgot password requested for email: {}", request.email());
         if (loginAttemptService.isBlocked(request.email())) {
+            log.warn("Forgot password blocked due to too many attempts for email: {}", request.email());
             return new MessageResponse(PASSWORD_RESET.getMessage()); // Silently fail to avoid enum
         }
         loginAttemptService.loginFailed(request.email()); // Count this as an attempt to avoid spam
@@ -181,9 +191,11 @@ public class UserService {
     }
 
     public MessageResponse resetPassword(ResetPasswordRequest request) {
+        log.info("Resetting password with token");
         String email = tokenService.validatePasswordResetToken(request.token());
 
         if (email == null) {
+            log.warn("Password reset failed: invalid or expired token");
             throw new BusinessException(TOKEN_INVALID_OR_EXPIRED);
         }
 
