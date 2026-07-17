@@ -10,6 +10,7 @@ import br.com.todolist.dto.response.UserResponse;
 import br.com.todolist.enums.UserRole;
 import br.com.todolist.exception.BusinessException;
 import br.com.todolist.infra.email.EmailService;
+import br.com.todolist.infra.security.LoginAttemptService;
 import br.com.todolist.infra.security.TokenService;
 import br.com.todolist.infra.security.UserDetailsImpl;
 import br.com.todolist.mapper.UserMapper;
@@ -23,6 +24,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
 
@@ -33,6 +35,7 @@ import static br.com.todolist.enums.ErrorCode.*;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class UserService {
 
     @Value("${app.url}")
@@ -49,6 +52,7 @@ public class UserService {
     private final TokenService tokenService;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
+    private final LoginAttemptService loginAttemptService;
 
     public UserResponse register(UserRequest request) {
         if (repository.existsByEmail(request.email())) {
@@ -103,6 +107,10 @@ public class UserService {
     }
 
     public LoginResponse login(LoginRequest request) {
+        if (loginAttemptService.isBlocked(request.email())) {
+            throw new BusinessException(INVALID_CREDENTIALS); // Ou TOO_MANY_REQUESTS
+        }
+
         try {
             var authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.email(), request.password())
@@ -116,6 +124,8 @@ public class UserService {
                 throw new BusinessException(ACCOUNT_NOT_VERIFIED);
             }
 
+            loginAttemptService.loginSucceeded(request.email());
+
             return new LoginResponse(
                     tokenService.generateAccessToken(user),
                     tokenService.generateRefreshToken(user),
@@ -124,6 +134,7 @@ public class UserService {
 
         } catch (AuthenticationException e) {
             log.warn("Failed login attempt for email: {}", request.email());
+            loginAttemptService.loginFailed(request.email());
             throw new BusinessException(INVALID_CREDENTIALS);
         }
     }
@@ -151,6 +162,11 @@ public class UserService {
     }
 
     public MessageResponse forgotPassword(EmailRequest request) {
+        if (loginAttemptService.isBlocked(request.email())) {
+            return new MessageResponse(PASSWORD_RESET.getMessage()); // Silently fail to avoid enum
+        }
+        loginAttemptService.loginFailed(request.email()); // Count this as an attempt to avoid spam
+
         repository.findByEmail(request.email()).ifPresent(user -> {
             String token = tokenService.generatePasswordResetToken(user);
 

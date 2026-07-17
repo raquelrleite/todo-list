@@ -6,6 +6,9 @@ import br.com.todolist.infra.oauth2.AuthenticatedUser;
 import br.com.todolist.service.CategoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -31,8 +34,9 @@ public class CategoryController {
     }
 
     @GetMapping
-    public List<CategoryResponse> findAll(@AuthenticationPrincipal AuthenticatedUser authenticated){
-        return service.findAll(authenticated.user());
+    public Page<CategoryResponse> findAll(@PageableDefault(size = 20) Pageable pageable, 
+                                          @AuthenticationPrincipal AuthenticatedUser authenticated){
+        return service.findAll(authenticated.user(), pageable);
     }
 
     @PatchMapping("/{id}")

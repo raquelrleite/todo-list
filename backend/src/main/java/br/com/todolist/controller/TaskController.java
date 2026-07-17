@@ -7,11 +7,12 @@ import br.com.todolist.infra.oauth2.AuthenticatedUser;
 import br.com.todolist.service.TaskService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/v1/tasks")
@@ -28,19 +29,24 @@ public class TaskController {
     }
 
     @GetMapping
-    public List<TaskResponse> findAll(@RequestParam boolean done, @AuthenticationPrincipal AuthenticatedUser authenticated) {
-        return service.findAll(done, authenticated.user());
+    public Page<TaskResponse> findAll(@RequestParam boolean done, 
+                                      @PageableDefault(size = 20) Pageable pageable, 
+                                      @AuthenticationPrincipal AuthenticatedUser authenticated) {
+        return service.findAll(done, authenticated.user(), pageable);
     }
 
     @GetMapping("/title/{title}")
-    public List<TaskResponse> findByTitle(@PathVariable String title,
+    public Page<TaskResponse> findByTitle(@PathVariable String title,
+                                          @PageableDefault(size = 20) Pageable pageable,
                                           @AuthenticationPrincipal AuthenticatedUser authenticated) {
-        return service.findByTitle(title, authenticated.user());
+        return service.findByTitle(title, authenticated.user(), pageable);
     }
 
     @GetMapping("/category/{id}")
-    public List<TaskResponse> findByCategory(@PathVariable Long id,  @AuthenticationPrincipal AuthenticatedUser authenticated) {
-        return service.findByCategory(id, authenticated.user());
+    public Page<TaskResponse> findByCategory(@PathVariable Long id,  
+                                             @PageableDefault(size = 20) Pageable pageable,
+                                             @AuthenticationPrincipal AuthenticatedUser authenticated) {
+        return service.findByCategory(id, authenticated.user(), pageable);
     }
 
     @PatchMapping("/{id}")

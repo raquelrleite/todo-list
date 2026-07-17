@@ -8,7 +8,8 @@ public enum EmailType {
 
     ACCOUNT_CONFIRMATION("Confirm your account", "account-confirmation", "Your account has been confirmed."),
     PASSWORD_CHANGED("Your password has been changed", "password-changed", "Your password was updated successfully."),
-    PASSWORD_RESET("Password reset request", "password-reset", "If an account with that email exists, a password reset link has been sent.");
+    PASSWORD_RESET("Password reset request", "password-reset", "If an account with that email exists, a password reset link has been sent."),
+    TASK_REMINDER("Task Reminder", "task-reminder", "You have tasks due soon.");
 
     private final String subject;
     private final String template;

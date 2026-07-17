@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
+import org.springframework.http.ResponseCookie;
+import org.springframework.http.HttpHeaders;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -29,11 +31,12 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request,
-                                        HttpServletResponse response,
-                                        Authentication authentication) throws IOException {
+            HttpServletResponse response,
+            Authentication authentication) throws IOException {
 
         if (!(authentication.getPrincipal() instanceof OAuth2UserPrincipal principal)) {
-            log.error("Unexpected principal type: {}", Objects.requireNonNull(authentication.getPrincipal()).getClass());
+            log.error("Unexpected principal type: {}",
+                    Objects.requireNonNull(authentication.getPrincipal()).getClass());
             response.sendRedirect(appUrl + "/login?error=oauth2");
             return;
         }
@@ -44,21 +47,20 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
         log.info("OAuth2 login successful for userId={} provider={}", user.getId(), user.getProvider());
 
-        response.addCookie(buildCookie("accessToken", accessToken, 60 * 60, true));
-        response.addCookie(buildCookie("refreshToken", refreshToken, 60 * 60 * 24 * 7, true));
-        response.addCookie(buildCookie("userName", encode(user.getName(), UTF_8).replace("+", "%20"), 60 * 60 * 24 * 7, false
-        ));
+        response.addHeader(HttpHeaders.SET_COOKIE, buildCookie("accessToken", accessToken, 60 * 60, true));
+        response.addHeader(HttpHeaders.SET_COOKIE, buildCookie("refreshToken", refreshToken, 60 * 60 * 24 * 7, true));
+        response.addHeader(HttpHeaders.SET_COOKIE,
+                buildCookie("userName", encode(user.getName(), UTF_8).replace("+", "%20"), 60 * 60 * 24 * 7, false));
 
         response.sendRedirect(appUrl + "/oauth2/callback");
     }
 
-    private Cookie buildCookie(String name, String value, int maxAgeSeconds, boolean httpOnly) {
-        Cookie cookie = new Cookie(name, value);
-        cookie.setHttpOnly(httpOnly);
-        cookie.setPath("/");
-        cookie.setMaxAge(maxAgeSeconds);
-        //  Precisa descomentar se for pra prod
-        // cookie.setSecure(true);
-        return cookie;
+    private String buildCookie(String name, String value, int maxAgeSeconds, boolean httpOnly) {
+        return ResponseCookie.from(name, value)
+                .httpOnly(httpOnly)
+                .path("/")
+                .maxAge(maxAgeSeconds)
+                .sameSite("Strict")
+                .build().toString();
     }
 }

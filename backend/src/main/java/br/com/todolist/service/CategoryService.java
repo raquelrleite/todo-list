@@ -2,15 +2,16 @@ package br.com.todolist.service;
 
 import br.com.todolist.dto.request.CategoryRequest;
 import br.com.todolist.dto.response.CategoryResponse;
-import br.com.todolist.dto.response.TaskResponse;
+import br.com.todolist.exception.BusinessException;
 import br.com.todolist.mapper.CategoryMapper;
 import br.com.todolist.model.Category;
-import br.com.todolist.model.Task;
 import br.com.todolist.model.User;
 import br.com.todolist.repository.CategoryRepository;
-import br.com.todolist.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -19,6 +20,7 @@ import static br.com.todolist.enums.ErrorCode.CATEGORY_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class CategoryService {
 
     private final CategoryRepository repository;
@@ -43,11 +45,9 @@ public class CategoryService {
                 .toList();
     }
 
-    public List<CategoryResponse> findAll(User user) {
-        return repository.findAllByUser(user)
-                .stream()
-                .map(mapper::toResponse)
-                .toList();
+    public Page<CategoryResponse> findAll(User user, Pageable pageable) {
+        return repository.findAllByUser(user, pageable)
+                .map(mapper::toResponse);
     }
 
     public CategoryResponse update(Long id, CategoryRequest request, User user) {
