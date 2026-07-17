@@ -112,6 +112,8 @@ const Icon = ({ d, size = 16, stroke = "currentColor", fill = "none", sw = 1.8 }
 );
 
 const I = {
+  sun:    "M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z",
+  moon:   "M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z",
   check:  "M20 6L9 17l-5-5",
   plus:   "M12 5v14M5 12h14",
   trash:  "M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6",
@@ -153,194 +155,249 @@ const spinBtn = {
 // ─── Global CSS ───────────────────────────────────────────────────────────────
 
 const CSS = `
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=DM+Mono:wght@300;400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;600;700&display=swap');
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --serif:   'Cormorant Garamond', Georgia, serif;
-  --mono:    'DM Mono', 'Courier New', monospace;
-  --bg:      #EDE8F8;
-  --surface: #F7F4FF;
-  --card:    #FFFFFF;
-  --border:  #DDD6F0;
-  --hover:   #F0ECFB;
-  --text:    #1E1830;
-  --muted:   #7B6FA0;
-  --muted2:  #B0A5CC;
-  --accent:  #8B6EE8;
-  --accent2: #6A4DC7;
-  --red:     #E05599;
-  --green:   #2DBF8A;
-  --r:       12px;
-  --sb:      230px;
+  --font-head: 'Outfit', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --bg:        #0B0E14;
+  --surface:   rgba(20, 24, 34, 0.65);
+  --card:      rgba(30, 36, 48, 0.45);
+  --border:    rgba(255, 255, 255, 0.08);
+  --border-hl: rgba(255, 255, 255, 0.18);
+  --hover:     rgba(255, 255, 255, 0.04);
+  --text:      #F8FAFC;
+  --muted:     #94A3B8;
+  --muted2:    #64748B;
+  --accent:    #8B5CF6;
+  --accent2:   #A78BFA;
+  --accent-bg: rgba(139, 92, 246, 0.15);
+  --red:       #F43F5E;
+  --red-bg:    rgba(244, 63, 94, 0.15);
+  --green:     #10B981;
+  --green-bg:  rgba(16, 185, 129, 0.15);
+  --r:         18px;
+  --sb:        250px;
 }
 
 html { height: 100%; }
 
 body {
   min-height: 100%;
-  background: linear-gradient(135deg, #EAE3FC 0%, #DDD4FA 45%, #F2E6F5 100%);
+  background: var(--bg);
+  background-image: 
+    radial-gradient(circle at 15% 50%, rgba(139, 92, 246, 0.08), transparent 25%),
+    radial-gradient(circle at 85% 30%, rgba(56, 189, 248, 0.08), transparent 25%);
   background-attachment: fixed;
-  font-family: var(--mono);
-  font-size: 13px;
-  font-weight: 300;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 400;
   color: var(--text);
   -webkit-font-smoothing: antialiased;
+  line-height: 1.5;
 }
 
 #root {
   position: fixed; inset: 0;
   display: flex; align-items: center; justify-content: center;
-  padding: 24px;
+  padding: 32px;
 }
 
 .app {
   display: flex;
-  width: 100%; max-width: 1060px;
-  height: 100%; max-height: 760px;
+  width: 100%; max-width: 1100px;
+  height: 100%; max-height: 800px;
   background: var(--surface);
-  border: 1px solid rgba(200,185,240,0.7);
-  border-radius: 20px; overflow: hidden;
-  box-shadow: 0 16px 56px rgba(80,40,160,0.14), 0 2px 8px rgba(80,40,160,0.06);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--border);
+  border-radius: 24px; overflow: hidden;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05);
 }
 
 /* Auth */
-.auth-wrap { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; padding: 24px; }
-.auth-box  { width: 100%; max-width: 390px; background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 38px 34px; box-shadow: 0 10px 44px rgba(100,60,180,0.11); }
-.logo { font-family: var(--serif); font-size: 32px; font-weight: 600; color: var(--accent); letter-spacing: -0.4px; margin-bottom: 4px; }
-.sub  { color: var(--muted); font-size: 12px; margin-bottom: 30px; }
-.tabs { display: flex; border-bottom: 1px solid var(--border); margin-bottom: 26px; }
-.tab  { flex: 1; padding: 9px; text-align: center; cursor: pointer; color: var(--muted); font-size: 11px; letter-spacing: 0.09em; text-transform: uppercase; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all 0.18s; }
-.tab.on { color: var(--accent); border-bottom-color: var(--accent); }
+.auth-wrap { position: fixed; inset: 0; overflow-y: auto; display: flex; flex-direction: column; padding: 24px; background: var(--bg); z-index: 1000; }
+.auth-box  { margin: auto; width: 100%; max-width: 420px; background: var(--card); backdrop-filter: blur(24px); border: 1px solid var(--border); border-radius: 24px; padding: 48px 40px; box-shadow: 0 24px 64px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05); animation: fu 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+.logo { font-family: var(--font-head); font-size: 36px; font-weight: 700; background: linear-gradient(135deg, #A78BFA, #38BDF8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -1px; margin-bottom: 8px; }
+.sub  { color: var(--muted); font-size: 14px; margin-bottom: 32px; font-weight: 300; }
+.tabs { display: flex; border-bottom: 1px solid var(--border); margin-bottom: 32px; }
+.tab  { flex: 1; padding: 12px; text-align: center; cursor: pointer; color: var(--muted); font-size: 13px; font-weight: 600; letter-spacing: 0.5px; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all 0.2s ease; }
+.tab.on { color: var(--text); border-bottom-color: var(--accent); }
 
 /* Form */
-.field { margin-bottom: 14px; }
-.label { display: block; font-size: 10px; color: var(--muted); letter-spacing: 0.09em; text-transform: uppercase; margin-bottom: 5px; }
+.field { margin-bottom: 20px; }
+.label { display: block; font-size: 11px; font-weight: 600; color: var(--muted); letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 8px; }
 input[data-f], select[data-f] {
-  width: 100%; padding: 9px 13px;
-  background: var(--surface); border: 1px solid var(--border); border-radius: var(--r);
-  color: var(--text); font-family: var(--mono); font-size: 13px;
-  outline: none; transition: border-color 0.18s;
+  width: 100%; padding: 12px 16px;
+  background: rgba(0,0,0,0.2); border: 1px solid var(--border); border-radius: var(--r);
+  color: var(--text); font-family: var(--font-body); font-size: 14px;
+  outline: none; transition: all 0.2s ease;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
 }
-input[data-f]:focus, select[data-f]:focus { border-color: var(--accent); }
+input[data-f]:focus, select[data-f]:focus { border-color: var(--accent2); background: rgba(0,0,0,0.4); box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15), inset 0 2px 4px rgba(0,0,0,0.1); }
 select[data-f] { cursor: pointer; appearance: none; }
+input[data-f]::placeholder { color: var(--muted2); }
 
 /* Tiptap */
-.ProseMirror { outline: none; font-family: var(--mono); font-size: 13px; font-weight: 300; color: var(--text); line-height: 1.6; }
-.ProseMirror p { margin: 0 0 6px; }
+.ProseMirror { outline: none; font-family: var(--font-body); font-size: 14px; font-weight: 400; color: var(--text); line-height: 1.6; }
+.ProseMirror p { margin: 0 0 8px; }
 .ProseMirror p:last-child { margin-bottom: 0; }
-.ProseMirror ul, .ProseMirror ol { padding-left: 20px; margin: 4px 0; }
-.ProseMirror li { margin-bottom: 2px; }
-.ProseMirror strong { font-weight: 500; color: var(--text); }
+.ProseMirror ul, .ProseMirror ol { padding-left: 24px; margin: 8px 0; }
+.ProseMirror li { margin-bottom: 4px; }
+.ProseMirror strong { font-weight: 600; color: #fff; }
 .ProseMirror em { font-style: italic; }
 
 /* Buttons */
-.btn     { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 9px 16px; border-radius: var(--r); cursor: pointer; font-family: var(--mono); font-size: 11px; font-weight: 400; letter-spacing: 0.07em; text-transform: uppercase; border: none; transition: all 0.18s; white-space: nowrap; }
-.btn-p   { background: var(--accent); color: #fff; }
-.btn-p:hover { background: var(--accent2); }
-.btn-g   { background: transparent; color: var(--muted); border: 1px solid var(--border); }
-.btn-g:hover { border-color: var(--muted); color: var(--text); }
-.btn-w   { width: 100%; }
-.btn:disabled { opacity: 0.4; cursor: not-allowed; }
-.ib      { background: none; border: none; cursor: pointer; color: var(--muted); padding: 3px; border-radius: 5px; display: flex; align-items: center; transition: color 0.15s; }
-.ib:hover { color: var(--text); }
-.ib.del:hover { color: var(--red); }
+.btn     { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 20px; border-radius: var(--r); cursor: pointer; font-family: var(--font-body); font-size: 13px; font-weight: 600; letter-spacing: 0.3px; border: none; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); white-space: nowrap; }
+.btn-p   { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #fff; box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3), inset 0 1px 0 rgba(255,255,255,0.2); }
+.btn-p:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(139, 92, 246, 0.4), inset 0 1px 0 rgba(255,255,255,0.2); filter: brightness(1.1); }
+.btn-p:active { transform: translateY(1px); box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3); }
+.btn-g   { background: rgba(255,255,255,0.05); color: var(--text); border: 1px solid var(--border); }
+.btn-g:hover { background: rgba(255,255,255,0.1); border-color: var(--border-hl); }
+.btn-w   { width: 100%; padding: 12px 20px; font-size: 14px; }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
+
+.ib      { background: none; border: none; cursor: pointer; color: var(--muted); padding: 6px; border-radius: 8px; display: flex; align-items: center; transition: all 0.2s ease; }
+.ib:hover { color: var(--text); background: var(--hover); }
+.ib.del:hover { color: var(--red); background: var(--red-bg); }
 
 /* Sidebar */
-.sb       { width: var(--sb); flex-shrink: 0; background: var(--card); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 22px 0; transition: transform 0.24s ease; }
-.sb-logo  { font-family: var(--serif); font-size: 22px; font-weight: 600; color: var(--accent); padding: 0 18px 18px; border-bottom: 1px solid var(--border); }
-.sb-sec   { padding: 16px 14px 0; }
-.sb-lbl   { font-size: 9px; letter-spacing: 0.13em; text-transform: uppercase; color: var(--muted2); margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; }
-.sb-item  { display: flex; align-items: center; justify-content: space-between; padding: 7px 9px; border-radius: 8px; cursor: pointer; color: var(--muted); font-size: 12px; margin-bottom: 2px; transition: all 0.14s; }
+.sb       { width: var(--sb); flex-shrink: 0; background: rgba(15, 18, 25, 0.6); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 28px 0; transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+.sb-logo  { font-family: var(--font-head); font-size: 24px; font-weight: 700; background: linear-gradient(135deg, #A78BFA, #38BDF8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; padding: 0 24px 24px; border-bottom: 1px solid var(--border); letter-spacing: -0.5px; }
+.sb-sec   { padding: 24px 16px 0; }
+.sb-sec::-webkit-scrollbar { width: 4px; }
+.sb-sec::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+.sb-sec::-webkit-scrollbar-track { background: transparent; }
+.sb-lbl   { font-size: 11px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; color: var(--muted2); margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; padding: 0 8px; }
+.sb-item  { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; border-radius: 12px; cursor: pointer; color: var(--muted); font-size: 13px; font-weight: 500; margin-bottom: 4px; transition: all 0.2s ease; border: 1px solid transparent; }
 .sb-item:hover { background: var(--hover); color: var(--text); }
-.sb-item.on    { background: rgba(139,110,232,0.11); color: var(--accent); }
-.sb-l    { display: flex; align-items: center; gap: 7px; }
-.dot     { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); opacity: 0.55; flex-shrink: 0; }
-.sb-acts { display: flex; gap: 2px; opacity: 0; transition: opacity 0.14s; }
+.sb-item.on    { background: var(--accent-bg); color: var(--text); border-color: rgba(139, 92, 246, 0.2); }
+.sb-item.on .dot { background: var(--accent); opacity: 1; box-shadow: 0 0 8px rgba(139,92,246,0.6); }
+.sb-l    { display: flex; align-items: center; gap: 10px; }
+.dot     { width: 8px; height: 8px; border-radius: 50%; background: var(--muted2); opacity: 0.6; flex-shrink: 0; transition: all 0.2s ease; }
+.sb-acts { display: flex; gap: 4px; opacity: 0; transition: opacity 0.2s ease; }
 .sb-item:hover .sb-acts { opacity: 1; }
-.sb-foot { margin-top: auto; padding: 14px; border-top: 1px solid var(--border); }
+.sb-foot { margin-top: auto; padding: 20px 24px; border-top: 1px solid var(--border); }
 
 /* Main */
 .main    { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
-.bar     { padding: 13px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 9px; background: var(--surface); }
-.sw      { flex: 1; position: relative; min-width: 120px; max-width: 260px; }
-.si      { position: absolute; left: 9px; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; }
-.sinput  { width: 100%; padding: 7px 9px 7px 29px; background: var(--card); border: 1px solid var(--border); border-radius: var(--r); color: var(--text); font-family: var(--mono); font-size: 12px; outline: none; transition: border-color 0.18s; }
-.sinput:focus { border-color: var(--accent); }
-.ftabs   { display: flex; gap: 3px; }
-.ft      { padding: 5px 11px; border-radius: 7px; cursor: pointer; font-size: 10px; letter-spacing: 0.07em; text-transform: uppercase; color: var(--muted); transition: all 0.14s; border: 1px solid transparent; }
+.bar     { padding: 16px 32px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 16px; background: rgba(20, 24, 34, 0.4); }
+.sw      { flex: 1; position: relative; min-width: 150px; max-width: 320px; }
+.si      { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; }
+.sinput  { width: 100%; padding: 10px 14px 10px 38px; background: rgba(0,0,0,0.2); border: 1px solid var(--border); border-radius: var(--r); color: var(--text); font-family: var(--font-body); font-size: 13px; outline: none; transition: all 0.2s ease; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1); }
+.sinput:focus { border-color: var(--accent); background: rgba(0,0,0,0.3); box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15), inset 0 1px 3px rgba(0,0,0,0.1); }
+.sinput::placeholder { color: var(--muted2); }
+.ftabs   { display: flex; gap: 6px; background: rgba(0,0,0,0.2); padding: 4px; border-radius: 12px; border: 1px solid var(--border); }
+.ft      { padding: 6px 16px; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 500; color: var(--muted); transition: all 0.2s ease; }
 .ft:hover { color: var(--text); }
-.ft.on   { background: rgba(139,110,232,0.1); color: var(--accent); border-color: rgba(139,110,232,0.2); }
+.ft.on   { background: var(--surface); color: var(--text); box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
 .bar-r   { margin-left: auto; }
 .ham     { display: none; }
-.content { flex: 1; overflow-y: auto; padding: 20px; }
-.content::-webkit-scrollbar { width: 4px; }
-.content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-.ptitle  { font-family: var(--serif); font-size: 25px; font-weight: 600; color: var(--text); margin-bottom: 3px; letter-spacing: -0.2px; }
-.pcount  { color: var(--muted); font-size: 11px; margin-bottom: 16px; }
+.content { flex: 1; overflow-y: auto; padding: 32px; }
+.content::-webkit-scrollbar { width: 6px; }
+.content::-webkit-scrollbar-thumb { background: var(--border-hl); border-radius: 3px; }
+.content::-webkit-scrollbar-track { background: transparent; }
+.ptitle  { font-family: var(--font-head); font-size: 32px; font-weight: 700; color: var(--text); margin-bottom: 4px; letter-spacing: -0.5px; }
+.pcount  { color: var(--muted); font-size: 13px; margin-bottom: 24px; font-weight: 500; }
 
 /* Task card */
-.tlist  { display: flex; flex-direction: column; gap: 7px; }
-.tcard  { background: var(--card); border: 1px solid var(--border); border-radius: var(--r); padding: 12px 14px; display: flex; align-items: flex-start; gap: 11px; transition: border-color 0.18s; animation: fu 0.2s ease; }
-@keyframes fu { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
-.tcard:hover { border-color: #c4b8e8; }
-.tcard.done  { opacity: 0.48; }
-.ck     { width: 17px; height: 17px; border-radius: 50%; flex-shrink: 0; margin-top: 2px; border: 1.5px solid var(--muted2); cursor: pointer; background: none; display: flex; align-items: center; justify-content: center; transition: all 0.18s; color: transparent; }
-.ck:hover    { border-color: var(--accent); color: var(--accent); }
-.ck.done     { border-color: var(--green); background: rgba(45,191,138,0.12); color: var(--green); }
+.tlist  { display: flex; flex-direction: column; gap: 12px; }
+.tcard  { background: var(--card); border: 1px solid var(--border); border-radius: var(--r); padding: 18px 20px; display: flex; align-items: flex-start; gap: 16px; transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1); animation: fu 0.3s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+@keyframes fu { from { opacity: 0; transform: translateY(8px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+.tcard:hover { border-color: var(--border-hl); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.2), 0 0 0 1px rgba(255,255,255,0.05); background: rgba(35, 42, 56, 0.6); }
+.tcard.done  { opacity: 0.5; filter: grayscale(50%); }
+.tcard.done:hover { opacity: 0.7; transform: none; box-shadow: none; background: var(--card); }
+.ck     { width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0; margin-top: 2px; border: 2px solid var(--muted2); cursor: pointer; background: rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: center; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); color: transparent; }
+.ck:hover    { border-color: var(--accent2); background: var(--accent-bg); color: var(--accent2); transform: scale(1.1); }
+.ck.done     { border-color: var(--green); background: var(--green); color: #fff; box-shadow: 0 0 12px rgba(16, 185, 129, 0.4); }
 .tbody  { flex: 1; min-width: 0; }
-.ttitle { font-size: 13px; color: var(--text); margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ttitle { font-size: 16px; font-weight: 500; color: var(--text); margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .ttitle.done { text-decoration: line-through; color: var(--muted); }
-.tdesc  { font-size: 11.5px; color: var(--muted); margin-bottom: 7px; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.tdesc  { font-size: 13px; color: var(--muted); margin-bottom: 12px; line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .tdesc p { margin: 0; }
-.tdesc ul, .tdesc ol { padding-left: 16px; margin: 0; }
-.tmeta  { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
-.badge  { display: inline-flex; align-items: center; gap: 3px; padding: 2px 7px; border-radius: 4px; font-size: 9px; letter-spacing: 0.05em; text-transform: uppercase; border: 1px solid transparent; }
-.due    { color: var(--muted); background: var(--surface); border-color: var(--border); }
-.due.overdue { color: var(--red); border-color: rgba(224,85,153,0.28); background: rgba(224,85,153,0.06); }
-.tacts  { display: flex; gap: 3px; opacity: 0; transition: opacity 0.14s; flex-shrink: 0; }
+.tdesc ul, .tdesc ol { padding-left: 20px; margin: 0; }
+.tmeta  { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.badge  { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; border: 1px solid transparent; background: rgba(255,255,255,0.05); color: var(--muted); }
+.due    { border-color: var(--border); }
+.due.overdue { color: var(--red); border-color: var(--red-bg); background: rgba(244, 63, 94, 0.1); }
+.tacts  { display: flex; gap: 4px; opacity: 0; transition: opacity 0.2s ease; flex-shrink: 0; }
 .tcard:hover .tacts { opacity: 1; }
 
 /* Empty */
-.empty   { text-align: center; padding: 48px 20px; color: var(--muted); }
-.empty svg { opacity: 0.15; margin-bottom: 14px; }
-.empty h3  { font-family: var(--serif); font-size: 20px; font-weight: 400; margin-bottom: 5px; color: var(--text); }
-.empty p   { font-size: 12px; }
+.empty   { text-align: center; padding: 80px 20px; color: var(--muted); display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.empty svg { opacity: 0.3; margin: 0 auto 24px; color: var(--accent); filter: drop-shadow(0 0 16px rgba(139,92,246,0.4)); }
+.empty h3  { font-family: var(--font-head); font-size: 24px; font-weight: 600; margin-bottom: 8px; color: var(--text); }
+.empty p   { font-size: 14px; max-width: 300px; margin: 0 auto; line-height: 1.6; }
 
 /* Modal */
-.ov    { position: fixed; inset: 0; background: rgba(24,16,44,0.48); backdrop-filter: blur(7px); display: flex; align-items: center; justify-content: center; z-index: 300; padding: 20px; animation: fi 0.14s ease; }
-@keyframes fi { from { opacity: 0; } to { opacity: 1; } }
-.modal { background: var(--card); border: 1px solid var(--border); border-radius: 16px; width: 100%; max-width: 490px; max-height: 92vh; overflow-y: auto; animation: su 0.18s ease; box-shadow: 0 20px 64px rgba(80,40,160,0.16); }
-@keyframes su { from { transform: translateY(14px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-.mh { padding: 18px 22px 0; display: flex; align-items: center; justify-content: space-between; }
-.mt { font-family: var(--serif); font-size: 21px; font-weight: 600; letter-spacing: -0.2px; }
-.mb { padding: 16px 22px; display: flex; flex-direction: column; gap: 13px; }
-.mf { padding: 0 22px 18px; display: flex; gap: 7px; justify-content: flex-end; }
+.ov    { position: fixed; inset: 0; background: rgba(5, 7, 10, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 24px; animation: fi 0.2s ease; }
+@keyframes fi { from { opacity: 0; backdrop-filter: blur(0px); } to { opacity: 1; backdrop-filter: blur(12px); } }
+.modal { background: var(--card); border: 1px solid var(--border-hl); border-radius: 24px; width: 100%; max-width: 540px; max-height: 90vh; overflow-y: auto; animation: su 0.3s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 32px 96px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.1); }
+@keyframes su { from { transform: translateY(20px) scale(0.95); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
+.modal::-webkit-scrollbar { width: 6px; }
+.modal::-webkit-scrollbar-thumb { background: var(--border-hl); border-radius: 3px; }
+.mh { padding: 24px 32px 0; display: flex; align-items: center; justify-content: space-between; }
+.mt { font-family: var(--font-head); font-size: 24px; font-weight: 700; letter-spacing: -0.5px; }
+.mb { padding: 24px 32px; display: flex; flex-direction: column; gap: 20px; }
+.mf { padding: 0 32px 24px; display: flex; gap: 12px; justify-content: flex-end; }
 
 /* Priority grid */
-.pgrid { display: grid; grid-template-columns: repeat(4,1fr); gap: 5px; }
-.popt  { padding: 7px 4px; border-radius: 8px; cursor: pointer; text-align: center; font-size: 9px; letter-spacing: 0.05em; text-transform: uppercase; border: 1px solid var(--border); transition: all 0.14s; color: var(--muted); }
-.popt:hover { border-color: var(--muted); color: var(--text); }
+.pgrid { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; }
+.popt  { padding: 10px 8px; border-radius: 10px; cursor: pointer; text-align: center; font-size: 11px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; border: 1px solid var(--border); transition: all 0.2s ease; color: var(--muted); background: rgba(0,0,0,0.2); }
+.popt:hover { border-color: var(--border-hl); color: var(--text); background: rgba(255,255,255,0.05); }
 
-.err   { color: var(--red); font-size: 11px; text-align: center; }
-.sb-ov { display: none; position: fixed; inset: 0; background: rgba(24,16,44,0.38); z-index: 200; backdrop-filter: blur(2px); }
+.err   { color: var(--red); font-size: 13px; text-align: center; background: var(--red-bg); border: 1px solid rgba(244,63,94,0.3); padding: 12px; border-radius: 12px; }
+.sb-ov { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 200; backdrop-filter: blur(4px); }
 
 /* Mobile */
-@media (max-width: 660px) {
+@media (max-width: 768px) {
   #root { padding: 0; }
   .app  { border-radius: 0; max-height: 100%; border: none; }
-  .sb   { position: fixed; top: 0; left: 0; height: 100%; z-index: 220; transform: translateX(-100%); box-shadow: 5px 0 28px rgba(80,40,160,0.12); }
+  .sb   { position: fixed; top: 0; left: 0; height: 100%; z-index: 300; transform: translateX(-100%); box-shadow: 20px 0 40px rgba(0,0,0,0.5); }
   .sb.open    { transform: translateX(0); }
-  .sb-ov.open { display: block; }
+  .sb-ov.open { display: block; z-index: 250; }
   .ham  { display: flex; }
   .ftabs { display: none; }
   .sw   { max-width: 100%; }
   .pgrid { grid-template-columns: repeat(2,1fr); }
+  .bar { padding: 16px 20px; }
+  .content { padding: 20px; }
+  .auth-box { padding: 32px 24px; border-radius: 0; border: none; height: 100%; max-width: 100%; display: flex; flex-direction: column; justify-content: center; }
+  .modal { max-height: 100vh; border-radius: 0; border: none; }
 }
-@media (min-width: 661px) and (max-width: 840px) {
-  :root { --sb: 190px; }
+@media (min-width: 769px) and (max-width: 900px) {
+  :root { --sb: 220px; }
 }
+
+/* Light Theme Overrides */
+body.light {
+  --bg: #F8FAFC;
+  --surface: rgba(255, 255, 255, 0.6);
+  --card: rgba(255, 255, 255, 0.95);
+  --border: rgba(0, 0, 0, 0.08);
+  --border-hl: rgba(0, 0, 0, 0.15);
+  --text: #0F172A;
+  --muted: #64748B;
+  --muted2: #94A3B8;
+  --hover: rgba(0, 0, 0, 0.04);
+}
+body.light .app { box-shadow: 0 24px 80px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,1); }
+body.light .auth-box { box-shadow: 0 24px 64px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,1); }
+body.light .tcard:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.04); background: rgba(255,255,255,1); }
+body.light input[data-f], body.light select[data-f], body.light .sinput, body.light .ftabs, body.light .ck { background: rgba(255,255,255,0.7); box-shadow: inset 0 1px 2px rgba(0,0,0,0.05); }
+body.light input[data-f]:focus, body.light select[data-f]:focus, body.light .sinput:focus { background: #fff; box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15), inset 0 1px 2px rgba(0,0,0,0.05); }
+body.light .btn-g { background: rgba(0,0,0,0.03); border: 1px solid var(--border); }
+body.light .btn-g:hover { background: rgba(0,0,0,0.06); }
+body.light .sb { background: rgba(248, 250, 252, 0.6); }
+body.light .bar { background: rgba(255, 255, 255, 0.4); }
+body.light .sb-sec::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); }
+body.light .content::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); }
+body.light .popt { background: rgba(255,255,255,0.7); color: var(--muted); }
+body.light .popt:hover { background: #fff; color: var(--text); }
+body.light .ProseMirror strong { color: var(--text); }
+
 `;
 
 // ─── Rich Text Editor ─────────────────────────────────────────────────────────
@@ -391,7 +448,7 @@ function Spinner({ label, value, onUp, onDown }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
       <button onClick={onUp}   style={spinBtn}><Icon d={I.chevU} size={13} /></button>
-      <div style={{ width: 52, textAlign: "center", fontFamily: "var(--mono)", fontSize: 26, fontWeight: 400, color: "var(--text)", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8, padding: "4px 0", lineHeight: 1 }}>
+      <div style={{ width: 52, textAlign: "center", fontFamily: "var(--font-body)", fontSize: 26, fontWeight: 400, color: "var(--text)", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8, padding: "4px 0", lineHeight: 1 }}>
         {value}
       </div>
       <button onClick={onDown} style={spinBtn}><Icon d={I.chevD} size={13} /></button>
@@ -461,8 +518,8 @@ function DateTimePicker({ value, onChange }) {
       <div onClick={() => setOpen(o => !o)} style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 12px", border: "1px solid var(--border)", borderRadius: "var(--r)", background: "var(--surface)", cursor: "pointer", transition: "border-color 0.18s", borderColor: open ? "var(--accent)" : "var(--border)" }}>
         <Icon d={I.cal} size={13} stroke="var(--muted)" />
         {sel
-          ? <span style={{ flex: 1, fontFamily: "var(--mono)", fontSize: 12, color: "var(--text)" }}>{displayLabel}</span>
-          : <span style={{ flex: 1, fontFamily: "var(--mono)", fontSize: 12, color: "var(--muted2)" }}>Pick a date & time…</span>
+          ? <span style={{ flex: 1, fontFamily: "var(--font-body)", fontSize: 12, color: "var(--text)" }}>{displayLabel}</span>
+          : <span style={{ flex: 1, fontFamily: "var(--font-body)", fontSize: 12, color: "var(--muted2)" }}>Pick a date & time…</span>
         }
         {sel && (
           <button onClick={clear} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--muted2)", display: "flex", padding: 1, borderRadius: 4 }}>
@@ -475,7 +532,7 @@ function DateTimePicker({ value, onChange }) {
         <div style={{ position: "absolute", top: "calc(100% + 6px)", left: 0, zIndex: 400, background: "var(--card)", border: "1px solid var(--border)", borderRadius: 12, boxShadow: "0 8px 32px rgba(80,40,160,0.14)", overflow: "hidden", width: 260, animation: "su 0.14s ease" }}>
           <div style={{ display: "flex", borderBottom: "1px solid var(--border)", background: "var(--surface)" }}>
             {[["cal", I.cal, "Date"], ["time", I.clock, "Time"]].map(([s, icon, label]) => (
-              <button key={s} onClick={() => s === "time" && !sel ? null : setStep(s)} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 5, padding: "8px 0", border: "none", background: "none", cursor: s === "time" && !sel ? "default" : "pointer", borderBottom: `2px solid ${step === s ? "var(--accent)" : "transparent"}`, color: step === s ? "var(--accent)" : s === "time" && !sel ? "var(--muted2)" : "var(--muted)", fontFamily: "var(--mono)", fontSize: 10, letterSpacing: "0.05em", textTransform: "uppercase", opacity: s === "time" && !sel ? 0.45 : 1, transition: "all 0.15s" }}>
+              <button key={s} onClick={() => s === "time" && !sel ? null : setStep(s)} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 5, padding: "8px 0", border: "none", background: "none", cursor: s === "time" && !sel ? "default" : "pointer", borderBottom: `2px solid ${step === s ? "var(--accent)" : "transparent"}`, color: step === s ? "var(--accent)" : s === "time" && !sel ? "var(--muted2)" : "var(--muted)", fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.05em", textTransform: "uppercase", opacity: s === "time" && !sel ? 0.45 : 1, transition: "all 0.15s" }}>
                 <Icon d={icon} size={11} /> {label}
               </button>
             ))}
@@ -485,7 +542,7 @@ function DateTimePicker({ value, onChange }) {
             <div style={{ padding: "12px 14px 14px" }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
                 <button onClick={prevMonth} style={arrowBtn}><Icon d={I.chevL} size={12} /></button>
-                <span style={{ fontFamily: "var(--serif)", fontSize: 15, fontWeight: 600, color: "var(--text)" }}>{MONTH_SHORT[cursor.m]} {cursor.y}</span>
+                <span style={{ fontFamily: "var(--font-head)", fontSize: 15, fontWeight: 600, color: "var(--text)" }}>{MONTH_SHORT[cursor.m]} {cursor.y}</span>
                 <button onClick={nextMonth} style={arrowBtn}><Icon d={I.chevR} size={12} /></button>
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", marginBottom: 3 }}>
@@ -497,7 +554,7 @@ function DateTimePicker({ value, onChange }) {
                   const todayCell = isToday(d);
                   return (
                     <button key={i} onClick={() => d && pickDay(d)} disabled={!d}
-                      style={{ padding: "5px 0", border: "none", borderRadius: 6, cursor: d ? "pointer" : "default", background: active ? "var(--accent)" : "transparent", color: active ? "#fff" : todayCell ? "var(--accent)" : d ? "var(--text)" : "transparent", fontFamily: "var(--mono)", fontSize: 11, fontWeight: active ? 500 : 300, outline: todayCell && !active ? "1.5px solid var(--accent)" : "none", outlineOffset: "-1px", transition: "background 0.1s" }}
+                      style={{ padding: "5px 0", border: "none", borderRadius: 6, cursor: d ? "pointer" : "default", background: active ? "var(--accent)" : "transparent", color: active ? "#fff" : todayCell ? "var(--accent)" : d ? "var(--text)" : "transparent", fontFamily: "var(--font-body)", fontSize: 11, fontWeight: active ? 500 : 300, outline: todayCell && !active ? "1.5px solid var(--accent)" : "none", outlineOffset: "-1px", transition: "background 0.1s" }}
                       onMouseEnter={e => { if (d && !active) e.currentTarget.style.background = "var(--hover)"; }}
                       onMouseLeave={e => { if (d && !active) e.currentTarget.style.background = "transparent"; }}
                     >
@@ -513,17 +570,17 @@ function DateTimePicker({ value, onChange }) {
             <div style={{ padding: "14px", display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 <Spinner label="Hr"  value={pad(hour)}   onUp={() => changeH(1)}  onDown={() => changeH(-1)} />
-                <span style={{ fontSize: 22, color: "var(--muted2)", fontFamily: "var(--mono)", marginBottom: 14 }}>:</span>
+                <span style={{ fontSize: 22, color: "var(--muted2)", fontFamily: "var(--font-body)", marginBottom: 14 }}>:</span>
                 <Spinner label="Min" value={pad(minute)} onUp={() => changeM(5)}  onDown={() => changeM(-5)} />
               </div>
               <div style={{ display: "flex", gap: 4, flexWrap: "wrap", justifyContent: "center" }}>
                 {[0, 6, 8, 9, 12, 14, 18, 20, 22].map(h => (
-                  <button key={h} onClick={() => { setHour(h); setMinute(0); if (sel) emit(sel, h, 0); }} style={{ padding: "2px 7px", border: "1px solid var(--border)", borderRadius: 5, background: hour === h && minute === 0 ? "var(--accent)" : "transparent", color: hour === h && minute === 0 ? "#fff" : "var(--muted)", fontFamily: "var(--mono)", fontSize: 9, cursor: "pointer", transition: "all 0.12s" }}>
+                  <button key={h} onClick={() => { setHour(h); setMinute(0); if (sel) emit(sel, h, 0); }} style={{ padding: "2px 7px", border: "1px solid var(--border)", borderRadius: 5, background: hour === h && minute === 0 ? "var(--accent)" : "transparent", color: hour === h && minute === 0 ? "#fff" : "var(--muted)", fontFamily: "var(--font-body)", fontSize: 9, cursor: "pointer", transition: "all 0.12s" }}>
                     {pad(h)}h
                   </button>
                 ))}
               </div>
-              <button onClick={() => setOpen(false)} style={{ width: "100%", padding: "7px 0", border: "none", borderRadius: 7, background: "var(--accent)", color: "#fff", fontFamily: "var(--mono)", fontSize: 10, letterSpacing: "0.07em", textTransform: "uppercase", cursor: "pointer" }}>
+              <button onClick={() => setOpen(false)} style={{ width: "100%", padding: "7px 0", border: "none", borderRadius: 7, background: "var(--accent)", color: "#fff", fontFamily: "var(--font-body)", fontSize: 10, letterSpacing: "0.07em", textTransform: "uppercase", cursor: "pointer" }}>
                 Done
               </button>
             </div>
@@ -607,7 +664,7 @@ function Auth({ onLogin, onForgot, oauthError }) {
     display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
     padding: "9px 16px", border: "1px solid var(--border)", borderRadius: "var(--r)",
     background: "var(--surface)", color: "var(--text)", textDecoration: "none",
-    fontFamily: "var(--mono)", fontSize: 12, transition: "border-color 0.18s", cursor: "pointer",
+    fontFamily: "var(--font-body)", fontSize: 12, transition: "border-color 0.18s", cursor: "pointer",
   };
 
   return (
@@ -669,7 +726,7 @@ function Auth({ onLogin, onForgot, oauthError }) {
         </button>
         {tab === "in" && (
           <div style={{ textAlign: "center", marginTop: 14 }}>
-            <button onClick={onForgot} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--muted)", fontSize: 11, fontFamily: "var(--mono)", letterSpacing: "0.05em" }}>
+            <button onClick={onForgot} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--muted)", fontSize: 11, fontFamily: "var(--font-body)", letterSpacing: "0.05em" }}>
               Forgot your password?
             </button>
           </div>
@@ -781,7 +838,7 @@ function ForgotPassword({ onBack }) {
             {err && <div className="err" style={{ marginBottom: 12 }}>{err}</div>}
             <button className="btn btn-p btn-w" onClick={go} disabled={busy}>{busy ? "…" : "Send Reset Link"}</button>
             <div style={{ textAlign: "center", marginTop: 14 }}>
-              <button onClick={onBack} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--muted)", fontSize: 11, fontFamily: "var(--mono)", letterSpacing: "0.05em" }}>
+              <button onClick={onBack} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--muted)", fontSize: 11, fontFamily: "var(--font-body)", letterSpacing: "0.05em" }}>
                 Back to Sign In
               </button>
             </div>
@@ -1036,13 +1093,19 @@ export default function App() {
   const [editCat,  setEditCat]  = useState(null);
   const [loading,  setLoading]  = useState(false);
   const [sbOpen,   setSbOpen]   = useState(false);
-  const { request } = useApi();
+  const [theme,    setTheme]    = useState(() => localStorage.getItem("theme") || "dark");
 
+  useEffect(() => {
+    document.body.className = theme;
+    localStorage.setItem("theme", theme);
+  }, [theme]);
+  const { request } = useApi();
   const loadTasks = useCallback(async () => {
     setLoading(true);
     try {
       const url = actCat ? `/v1/tasks/category/${actCat}` : `/v1/tasks?done=${filter === "done"}`;
-      setTasks(await request("GET", url) || []);
+      const data = await request("GET", url);
+      setTasks(Array.isArray(data) ? data : (data?.content || data?.tasks || []));
     } catch (e) {
       if (e.message?.toLowerCase().includes("token")) logout();
     } finally {
@@ -1051,7 +1114,10 @@ export default function App() {
   }, [filter, actCat, request]);
 
   const loadCats = useCallback(async () => {
-    try { setCats(await request("GET", "/v1/categories") || []); } catch {}
+    try { 
+      const data = await request("GET", "/v1/categories");
+      setCats(Array.isArray(data) ? data : (data?.content || data?.categories || []));
+    } catch {}
   }, [request]);
 
   useEffect(() => { if (authed) { loadTasks(); loadCats(); } }, [authed, loadTasks, loadCats]);
@@ -1104,7 +1170,7 @@ export default function App() {
             ))}
           </div>
 
-          <div className="sb-sec" style={{ marginTop: 14 }}>
+          <div className="sb-sec" style={{ marginTop: 14, flex: 1, overflowY: "auto", minHeight: 0 }}>
             <div className="sb-lbl">
               Categories
               <button className="ib" onClick={() => { setEditCat(null); setModal("cat"); }}><Icon d={I.plus} size={12} /></button>
@@ -1125,11 +1191,11 @@ export default function App() {
           <div className="sb-foot">
             <div style={{ marginBottom: 10, display: "flex", alignItems: "center", gap: 8 }}>
               <div style={{ width: 28, height: 28, borderRadius: "50%", background: "rgba(139,110,232,0.15)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                <span style={{ fontFamily: "var(--serif)", fontSize: 14, color: "var(--accent)", fontWeight: 600 }}>
+                <span style={{ fontFamily: "var(--font-head)", fontSize: 14, color: "var(--accent)", fontWeight: 600 }}>
                   {(localStorage.getItem("name") || "?")[0].toUpperCase()}
                 </span>
               </div>
-              <span style={{ fontFamily: "var(--mono)", fontSize: 11, color: "var(--text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              <span style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                 {localStorage.getItem("name") || ""}
               </span>
             </div>
@@ -1144,11 +1210,10 @@ export default function App() {
               <span className="si"><Icon d={I.search} size={12} /></span>
               <input className="sinput" placeholder="Search tasks…" value={search} onChange={e => setSearch(e.target.value)} />
             </div>
-            <div className="ftabs">
-              <div className={`ft ${filter === "pending" ? "on" : ""}`} onClick={() => setFilter("pending")}>Pending</div>
-              <div className={`ft ${filter === "done"    ? "on" : ""}`} onClick={() => setFilter("done")}>Done</div>
-            </div>
-            <div className="bar-r">
+            <div className="bar-r" style={{ display: "flex", gap: 8 }}>
+              <button className="ib" onClick={() => setTheme(t => t === "dark" ? "light" : "dark")}>
+                {theme === "dark" ? <Icon d={I.sun} size={15} /> : <Icon d={I.moon} size={15} />}
+              </button>
               <button className="btn btn-p" onClick={() => { setEditTask(null); setModal("task"); }}>
                 <Icon d={I.plus} size={13} />New Task
               </button>
