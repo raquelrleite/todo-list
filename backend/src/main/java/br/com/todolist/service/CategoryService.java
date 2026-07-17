@@ -27,7 +27,6 @@ public class CategoryService {
 
     private final CategoryRepository repository;
     private final CategoryMapper mapper;
-    private final TaskService taskService;
 
     public CategoryResponse create(CategoryRequest request, User user) {
         log.info("Creating category with title: {} for user: {}", request.title(), user.getEmail());
