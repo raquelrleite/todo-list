@@ -104,8 +104,7 @@ public class UserService {
                 emailService.sendEmail(user.getEmail(), ACCOUNT_CONFIRMATION, Map.of(
                         "name", user.getName(),
                         "confirmUrl", appUrl + "/account-confirmation?token=" + token,
-                        EXPIRATION_HOURS, confirmationExpirationHours
-                ));
+                        EXPIRATION_HOURS, confirmationExpirationHours));
             }
         });
         return new MessageResponse(ACCOUNT_CONFIRMATION.getMessage());
@@ -118,8 +117,7 @@ public class UserService {
 
         try {
             var authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(request.email(), request.password())
-            );
+                    new UsernamePasswordAuthenticationToken(request.email(), request.password()));
 
             if (!(authentication.getPrincipal() instanceof UserDetailsImpl(User user))) {
                 throw new BusinessException(INVALID_CREDENTIALS);
@@ -136,8 +134,7 @@ public class UserService {
             return new LoginResponse(
                     tokenService.generateAccessToken(user),
                     tokenService.generateRefreshToken(user),
-                    user.getName()
-            );
+                    user.getName());
 
         } catch (AuthenticationException e) {
             log.warn("Failed login attempt for email: {}", request.email());
@@ -162,8 +159,7 @@ public class UserService {
             log.info("Token refreshed for user ID: {}", userId);
             return new LoginResponse(
                     tokenService.generateAccessToken(user),
-                    tokenService.generateRefreshToken(user), user.getName()
-            );
+                    tokenService.generateRefreshToken(user), user.getName());
         } catch (NumberFormatException e) {
             throw new BusinessException(TOKEN_INVALID_OR_EXPIRED);
         }
@@ -173,9 +169,9 @@ public class UserService {
         log.info("Forgot password requested for email: {}", request.email());
         if (loginAttemptService.isBlocked(request.email())) {
             log.warn("Forgot password blocked due to too many attempts for email: {}", request.email());
-            return new MessageResponse(PASSWORD_RESET.getMessage()); // Silently fail to avoid enum
+            return new MessageResponse(PASSWORD_RESET.getMessage());
         }
-        loginAttemptService.loginFailed(request.email()); // Count this as an attempt to avoid spam
+        loginAttemptService.loginFailed(request.email());
 
         repository.findByEmail(request.email()).ifPresent(user -> {
             String token = tokenService.generatePasswordResetToken(user);
@@ -183,8 +179,7 @@ public class UserService {
             emailService.sendEmail(user.getEmail(), PASSWORD_RESET, Map.of(
                     "name", user.getName(),
                     "appUrl", appUrl + "/reset-password?token=" + token,
-                    EXPIRATION_HOURS, 1
-            ));
+                    EXPIRATION_HOURS, 1));
         });
 
         return new MessageResponse(PASSWORD_RESET.getMessage());
@@ -206,8 +201,7 @@ public class UserService {
         repository.save(user);
 
         emailService.sendEmail(user.getEmail(), PASSWORD_CHANGED, Map.of(
-                "name", user.getName()
-        ));
+                "name", user.getName()));
 
         return new MessageResponse(PASSWORD_CHANGED.getMessage());
     }

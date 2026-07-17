@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Task {
+public class Task extends Auditable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -35,12 +35,6 @@ public class Task {
 
     @Column(nullable = false)
     private boolean done;
-
-    @Column(nullable = false)
-    private LocalDateTime created;
-
-    @Column(nullable = false)
-    private LocalDateTime updated;
 
     @Column(name = "due_date")
     private LocalDateTime dueDate;
