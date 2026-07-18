@@ -15,6 +15,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @RestController
@@ -45,13 +46,13 @@ public class CategoryController {
     }
 
     @PatchMapping("/{id}")
-    public CategoryResponse update(@PathVariable Long id, @RequestBody @Valid CategoryRequest request, @AuthenticationPrincipal AuthenticatedUser authenticated){
+    public CategoryResponse update(@PathVariable UUID id, @RequestBody @Valid CategoryRequest request, @AuthenticationPrincipal AuthenticatedUser authenticated){
         log.info("User {} is updating category ID: {}", authenticated.user().getEmail(), id);
         return service.update(id, request, authenticated.user());
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id, @AuthenticationPrincipal AuthenticatedUser authenticated){
+    public void delete(@PathVariable UUID id, @AuthenticationPrincipal AuthenticatedUser authenticated){
         log.info("User {} is deleting category ID: {}", authenticated.user().getEmail(), id);
         service.delete(id, authenticated.user());
     }

@@ -15,6 +15,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @Slf4j
 @RestController
 @RequestMapping("/v1/tasks")
@@ -48,7 +50,7 @@ public class TaskController {
     }
 
     @GetMapping("/category/{id}")
-    public Page<TaskResponse> findByCategory(@PathVariable Long id,  
+    public Page<TaskResponse> findByCategory(@PathVariable UUID id,  
                                              @PageableDefault(size = 20) Pageable pageable,
                                              @AuthenticationPrincipal AuthenticatedUser authenticated) {
         log.info("User {} is finding tasks by category ID: {}", authenticated.user().getEmail(), id);
@@ -56,7 +58,7 @@ public class TaskController {
     }
 
     @PatchMapping("/{id}")
-    public TaskResponse update(@PathVariable Long id,
+    public TaskResponse update(@PathVariable UUID id,
                                @RequestBody @Valid TaskUpdateRequest request,
                                @AuthenticationPrincipal AuthenticatedUser authenticated) {
         log.info("User {} is updating task ID: {}", authenticated.user().getEmail(), id);
@@ -64,14 +66,14 @@ public class TaskController {
     }
 
     @PatchMapping("/complete/{id}")
-    public TaskResponse complete(@PathVariable Long id,
+    public TaskResponse complete(@PathVariable UUID id,
                                  @AuthenticationPrincipal AuthenticatedUser authenticated) {
         log.info("User {} is toggling completion for task ID: {}", authenticated.user().getEmail(), id);
         return service.complete(id, authenticated.user());
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id,
+    public void delete(@PathVariable UUID id,
                        @AuthenticationPrincipal AuthenticatedUser authenticated) {
         log.info("User {} is deleting task ID: {}", authenticated.user().getEmail(), id);
         service.delete(id, authenticated.user());

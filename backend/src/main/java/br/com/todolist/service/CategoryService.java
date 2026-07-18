@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 import static br.com.todolist.enums.ErrorCode.CATEGORY_ALREADY_EXISTS;
 import static br.com.todolist.enums.ErrorCode.CATEGORY_NOT_FOUND;
@@ -55,7 +56,7 @@ public class CategoryService {
                 .map(mapper::toResponse);
     }
 
-    public CategoryResponse update(Long id, CategoryRequest request, User user) {
+    public CategoryResponse update(UUID id, CategoryRequest request, User user) {
         log.info("Updating category ID: {} for user: {}", id, user.getEmail());
         Category category = repository.findByIdAndUser(id, user)
                 .orElseThrow(() -> new BusinessException(CATEGORY_NOT_FOUND));
@@ -65,7 +66,7 @@ public class CategoryService {
        return mapper.toResponse(category);
     }
 
-    public void delete(Long id, User user) {
+    public void delete(UUID id, User user) {
         log.info("Deleting category ID: {} for user: {}", id, user.getEmail());
         var category = repository.findByIdAndUser(id, user)
                 .orElseThrow(() -> new BusinessException(CATEGORY_NOT_FOUND));

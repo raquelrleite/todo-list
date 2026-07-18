@@ -16,6 +16,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
+
 import static br.com.todolist.enums.ErrorCode.CATEGORY_NOT_FOUND;
 import static br.com.todolist.enums.ErrorCode.TASK_NOT_FOUND;
 
@@ -56,7 +58,7 @@ public class TaskService {
                 .map(mapper::toResponse);
     }
 
-    public TaskResponse update(Long id, TaskUpdateRequest request, User user) {
+    public TaskResponse update(UUID id, TaskUpdateRequest request, User user) {
         log.info("Updating task ID: {} for user: {}", id, user.getEmail());
         var task = repository.findByIdAndUser(id, user)
                 .orElseThrow(() -> new BusinessException(TASK_NOT_FOUND));
@@ -73,13 +75,13 @@ public class TaskService {
         return mapper.toResponse(task);
     }
 
-    public Page<TaskResponse> findByCategory(Long id, User user, Pageable pageable) {
+    public Page<TaskResponse> findByCategory(UUID id, User user, Pageable pageable) {
         log.info("Finding tasks by category ID: {} for user: {}", id, user.getEmail());
         return repository.findByCategoryIdAndUser(id, user, pageable)
                 .map(mapper::toResponse);
     }
 
-    public TaskResponse complete(Long id, User user) {
+    public TaskResponse complete(UUID id, User user) {
         log.info("Toggling completion for task ID: {} for user: {}", id, user.getEmail());
         var task = repository.findByIdAndUser(id, user)
                 .orElseThrow(() -> new BusinessException(TASK_NOT_FOUND));
@@ -89,7 +91,7 @@ public class TaskService {
         return mapper.toResponse(task);
     }
 
-    public void delete(Long id, User user) {
+    public void delete(UUID id, User user) {
         log.info("Deleting task ID: {} for user: {}", id, user.getEmail());
         var task = repository.findByIdAndUser(id, user)
                 .orElseThrow(() -> new BusinessException(TASK_NOT_FOUND));

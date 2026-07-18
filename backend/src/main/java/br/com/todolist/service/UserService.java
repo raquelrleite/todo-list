@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
+import java.util.UUID;
 
 import static br.com.todolist.enums.AuthProvider.LOCAL;
 import static br.com.todolist.enums.EmailType.*;
@@ -112,7 +113,7 @@ public class UserService {
 
     public LoginResponse login(LoginRequest request) {
         if (loginAttemptService.isBlocked(request.email())) {
-            throw new BusinessException(INVALID_CREDENTIALS); // Ou TOO_MANY_REQUESTS
+            throw new BusinessException(INVALID_CREDENTIALS);
         }
 
         try {
@@ -152,7 +153,7 @@ public class UserService {
         }
 
         try {
-            Long userId = Long.valueOf(subject);
+            UUID userId = UUID.fromString(subject);
             var user = repository.findById(userId)
                     .orElseThrow(() -> new BusinessException(USER_NOT_FOUND));
 
@@ -160,7 +161,7 @@ public class UserService {
             return new LoginResponse(
                     tokenService.generateAccessToken(user),
                     tokenService.generateRefreshToken(user), user.getName());
-        } catch (NumberFormatException e) {
+        } catch (IllegalArgumentException e) {
             throw new BusinessException(TOKEN_INVALID_OR_EXPIRED);
         }
     }
